@@ -10,29 +10,29 @@ Centroid: {}, {}, {}
 Other attributes:{}
 """
 
-AVAILABLE_BACKENDS = []
+PLOT_BACKENDS = []
 # Add each backend in order of preference
 # Add pythreejs
 try:
     import pythreejs
-    AVAILABLE_BACKENDS.append("pythreejs")
+    PLOT_BACKENDS.append("pythreejs")
 except ImportError:
     pass
 # Add PyVista
 try:
     import pyvista
-    AVAILABLE_BACKENDS.append("pyvista")
+    PLOT_BACKENDS.append("pyvista")
 except ImportError:
     pass
 # Add matplotlib
 try:
     import matplotlib
-    AVAILABLE_BACKENDS.append("matplotlib")
+    PLOT_BACKENDS.append("matplotlib")
 except ImportError:
     pass
 # Add threejs
 try:
     from IPython.display import IFrame
-    AVAILABLE_BACKENDS.append("threejs")
+    PLOT_BACKENDS.append("threejs")
 except ImportError:
     pass
