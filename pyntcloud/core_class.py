@@ -1,13 +1,11 @@
 import os
 
-import numpy as np
-import pandas as pd
-
+from .backend import BACKEND
 from .structures.base import StructuresDict
 from .filters import ALL_FILTERS
 from .io import FROM_FILE, TO_FILE, FROM_INSTANCE, TO_INSTANCE
 from .neighbors import k_neighbors, r_neighbors
-from .plot import DESCRIPTION, AVAILABLE_BACKENDS
+from .plot import DESCRIPTION, PLOT_BACKENDS
 from .plot.matplotlib_backend import plot_with_matplotlib
 from .plot.threejs_backend import plot_with_threejs
 from .plot.pythreejs_backend import plot_with_pythreejs
@@ -15,7 +13,6 @@ from .plot.pyvista_backend import plot_with_pyvista
 from .samplers import ALL_SAMPLERS
 from .scalar_fields import ALL_SF
 from .structures import ALL_STRUCTURES
-from .utils.dataframe import convert_columns_dtype
 
 
 class PyntCloud(object):
@@ -26,12 +23,12 @@ class PyntCloud(object):
 
         Parameters
         ----------
-        points: pd.DataFrame
+        points: DataFrame from DATAFRAME_BACKENDS
             DataFrame of N rows by M columns.
             Each row represents one point of the point cloud.
             Each column represents one scalar field associated to its corresponding point.
 
-        mesh: pd.DataFrame or None, optional
+        mesh: DataFrame from DATAFRAME_BACKENDS or None, optional
             Default: None
             Triangular mesh associated with points.
 
@@ -40,8 +37,8 @@ class PyntCloud(object):
 
         kwargs: custom attributes
         """
-        self.points = points
-        self.mesh = mesh
+        self.points = BACKEND.DataFrame(points)
+        self.mesh = BACKEND.DataFrame(mesh)
         self.structures = StructuresDict()
         structures = structures or {}
         for key, val in structures.items():
@@ -82,7 +79,7 @@ class PyntCloud(object):
 
     @points.setter
     def points(self, df):
-        if not isinstance(df, pd.DataFrame):
+        if not isinstance(df, BACKEND.DataFrame):
             raise TypeError("Points argument must be a DataFrame")
         elif not set(['x', 'y', 'z']).issubset(df.columns):
             raise ValueError("Points must have x, y and z coordinates")
@@ -96,7 +93,7 @@ class PyntCloud(object):
     def mesh(self, df):
         # allow PyntCloud to don't have mesh assigned
         if df is not None:
-            if not isinstance(df, pd.DataFrame):
+            if not isinstance(df, BACKEND.DataFrame):
                 raise TypeError("Mesh argument must be a DataFrame")
             elif not set(['v1', 'v2', 'v3']).issubset(df.columns):
                 print(df.columns)
@@ -168,7 +165,6 @@ class PyntCloud(object):
 
         kwargs: only usable in some formats
         """
-        convert_columns_dtype(self.points, np.float64, np.float32)
         ext = filename.split(".")[-1].upper()
         if ext not in TO_FILE:
             raise ValueError(
@@ -191,7 +187,6 @@ class PyntCloud(object):
 
         kwargs: only usable in some formats
         """
-        convert_columns_dtype(self.points, np.float64, np.float32)
         library = library.upper()
         if library not in TO_INSTANCE:
             raise ValueError(
@@ -748,8 +743,8 @@ class PyntCloud(object):
         backend = args.pop("backend")
 
         # Choose fisrt avaialable backend
-        if backend is None and len(AVAILABLE_BACKENDS) > 0:
-            backend = AVAILABLE_BACKENDS[0]
+        if backend is None and len(PLOT_BACKENDS) > 0:
+            backend = PLOT_BACKENDS[0]
         elif backend is None:
             backend = 'pythreejs'
 
