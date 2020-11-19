@@ -30,6 +30,6 @@ except ImportError:
 DATAFRAME_BACKEND = DATAFRAME_BACKENDS[os.environ.get("PYNTCLOUD_BACKEND")]
 if DATAFRAME_BACKEND is None:
     raise ImportError(
-        f"{missing_package} is required for {os.environ.get("PYNTCLOUD_BACKEND")}")
+        f"{missing_package} is required for {os.environ.get('PYNTCLOUD_BACKEND')}")
 
 ARRAY_BACKEND = ARRAY_BACKENDS[os.environ.get("PYNTCLOUD_BACKEND").split("MULTI-")[-1]]

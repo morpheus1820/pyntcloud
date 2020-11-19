@@ -1,6 +1,6 @@
 import os
 
-from .backend import BACKEND
+from .backend import DATAFRAME_BACKEND
 from .structures.base import StructuresDict
 from .filters import ALL_FILTERS
 from .io import FROM_FILE, TO_FILE, FROM_INSTANCE, TO_INSTANCE
@@ -37,8 +37,8 @@ class PyntCloud(object):
 
         kwargs: custom attributes
         """
-        self.points = BACKEND.DataFrame(points)
-        self.mesh = BACKEND.DataFrame(mesh)
+        self.points = DATAFRAME_BACKEND.DataFrame(points)
+        self.mesh = DATAFRAME_BACKEND.DataFrame(mesh)
         self.structures = StructuresDict()
         structures = structures or {}
         for key, val in structures.items():
@@ -79,7 +79,7 @@ class PyntCloud(object):
 
     @points.setter
     def points(self, df):
-        if not isinstance(df, BACKEND.DataFrame):
+        if not isinstance(df, DATAFRAME_BACKEND.DataFrame):
             raise TypeError("Points argument must be a DataFrame")
         elif not set(['x', 'y', 'z']).issubset(df.columns):
             raise ValueError("Points must have x, y and z coordinates")
@@ -93,7 +93,7 @@ class PyntCloud(object):
     def mesh(self, df):
         # allow PyntCloud to don't have mesh assigned
         if df is not None:
-            if not isinstance(df, BACKEND.DataFrame):
+            if not isinstance(df, DATAFRAME_BACKEND.DataFrame):
                 raise TypeError("Mesh argument must be a DataFrame")
             elif not set(['v1', 'v2', 'v3']).issubset(df.columns):
                 print(df.columns)
