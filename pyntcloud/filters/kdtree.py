@@ -1,8 +1,7 @@
-import numpy as np
-
 from scipy.stats import zscore
 
 from .base import Filter
+from pyntcloud.backend import ARRAY_BACKEND as np
 
 
 class KDTreeFilter(Filter):
@@ -99,7 +98,6 @@ class StatisticalOutlierRemovalFilter(KDTreeFilter):
     def compute(self):
         distances = self.kdtree.query(self.points, k=self.k, n_jobs=-1)[0]
         z_distances = zscore(np.mean(distances, axis=1), ddof=1)
-        print(z_distances)
-        sor_filter = abs(z_distances) < self.z_max
+        sor_filter = np.abs(z_distances) < self.z_max
 
         return sor_filter

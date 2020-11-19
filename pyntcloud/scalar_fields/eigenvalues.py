@@ -18,7 +18,9 @@ class EigenValuesScalarField(ScalarField):
         self.ev = ev
 
     def extract_info(self):
-        self.ev = self.pyntcloud.points[self.ev].values
+        self.ev0 = self.pyntcloud.points[self.ev[0]]
+        self.ev1 = self.pyntcloud.points[self.ev[1]]
+        self.ev2 = self.pyntcloud.points[self.ev[2]]
 
 
 class Anisotropy(EigenValuesScalarField):
@@ -26,8 +28,7 @@ class Anisotropy(EigenValuesScalarField):
     """
     def compute(self):
         name = "anisotropy{}".format(self.k)
-        ev = self.ev
-        self.to_be_added[name] = np.nan_to_num((ev[:, 0] - ev[:, 2]) / ev[:, 0])
+        self.to_be_added[name] = (self.ev0 - self.ev2) / self.ev0
 
 
 class Curvature(EigenValuesScalarField):
@@ -35,8 +36,7 @@ class Curvature(EigenValuesScalarField):
     """
     def compute(self):
         name = "curvature{}".format(self.k)
-        ev = self.ev
-        self.to_be_added[name] = np.nan_to_num(ev[:, 2] / (ev[:, 0] + ev[:, 1] + ev[:, 2]))
+        self.to_be_added[name] = self.ev2 / (self.ev0 + self.ev1 + self.ev2)
 
 
 class Eigenentropy(EigenValuesScalarField):
@@ -44,11 +44,12 @@ class Eigenentropy(EigenValuesScalarField):
     """
     def compute(self):
         name = "eigenentropy{}".format(self.k)
-        ev = self.ev
-        result = np.zeros(ev.shape[0])
-        for i in range(3):
-            result += ev[:, i] * np.log(ev[:, i])
-        self.to_be_added[name] = np.nan_to_num(-result)
+        
+        log_ev0 = self.ev0 * np.log(self.ev0)
+        log_ev1 = self.ev1 * np.log(self.ev1)
+        log_ev2 = self.ev2 * np.log(self.ev2)
+
+        self.to_be_added[name] = -(log_ev0 + log_ev1 + log_ev2)
 
 
 class EigenSum(EigenValuesScalarField):
@@ -56,7 +57,7 @@ class EigenSum(EigenValuesScalarField):
     """
     def compute(self):
         name = "eigen_sum{}".format(self.k)
-        self.to_be_added[name] = self.ev[:, 0] + self.ev[:, 1] + self.ev[:, 2]
+        self.to_be_added[name] = self.self.ev0 + self.self.ev1 + self.self.ev2
 
 
 class Linearity(EigenValuesScalarField):
@@ -64,8 +65,8 @@ class Linearity(EigenValuesScalarField):
     """
     def compute(self):
         name = "linearity{}".format(self.k)
-        ev = self.ev
-        self.to_be_added[name] = np.nan_to_num((ev[:, 0] - ev[:, 1]) / ev[:, 0])
+        
+        self.to_be_added[name] = (self.ev0 - self.ev1) / self.ev0
 
 
 class Omnivariance(EigenValuesScalarField):
@@ -73,8 +74,8 @@ class Omnivariance(EigenValuesScalarField):
     """
     def compute(self):
         name = "omnivariance{}".format(self.k)
-        ev = self.ev
-        self.to_be_added[name] = np.nan_to_num((ev[:, 0] * ev[:, 1] * ev[:, 2]) ** (1 / 3))
+        
+        self.to_be_added[name] = (self.ev0 * self.ev1 * self.ev2) ** (1 / 3)
 
 
 class Planarity(EigenValuesScalarField):
@@ -82,8 +83,8 @@ class Planarity(EigenValuesScalarField):
     """
     def compute(self):
         name = "planarity{}".format(self.k)
-        ev = self.ev
-        self.to_be_added[name] = np.nan_to_num((ev[:, 1] - ev[:, 2]) / ev[:, 0])
+        
+        self.to_be_added[name] = (self.ev1 - self.ev2) / self.ev0
 
 
 class Sphericity(EigenValuesScalarField):
@@ -91,5 +92,5 @@ class Sphericity(EigenValuesScalarField):
     """
     def compute(self):
         name = "sphericity{}".format(self.k)
-        ev = self.ev
-        self.to_be_added[name] = np.nan_to_num(ev[:, 2] / ev[:, 0])
+        
+        self.to_be_added[name] = self.ev2 / self.ev0

@@ -1,5 +1,5 @@
-import numpy as np
 from .base import Filter
+from pyntcloud.backend import ARRAY_BACKEND as np
 
 
 class XYZFilter(Filter):
